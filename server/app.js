@@ -27,6 +27,7 @@ app.get('/',
 
 app.get('/create',
   (req, res) => {
+    console.log(req.session);
     res.render('index');
   });
 
@@ -81,7 +82,6 @@ app.post('/links',
 // Write your authentication routes here
 /************************************************************/
 
-// TODO create an invalid session
 app.get('/signup',
   (req, res) => {
     res.render('signup');
@@ -101,29 +101,37 @@ app.post('/signup', (req, res) => {
     });
 });
 
-// TODO create an invalid session
 app.get('/login',
   (req, res) => {
     res.render('login');
   });
 
 // TODO validate session upon successful login
+// TODO check that cookie/session haven't been deleted
 app.post('/login', (req, res) => {
-  models.Users.get({ username: req.body.username })
-    .then(user => {
-      return user && models.Users.compare(req.body.password, user.password, user.salt);
-    })
-    .then(credentialsAreValid => {
-      if (credentialsAreValid) {
-        console.log('SUCCESS! You deserve a session, friend');
-        res.location('/');
-        res.sendStatus(200);
-      } else {
-        console.log('INVALID credentials, please try again');
-        res.location('/login');
-        res.sendStatus(401);
-      }
+  parseCookies(req, res, () => {
+    Auth.createSession(req, res, () => {
+      models.Users.get({ username: req.body.username })
+        .then(user => {
+          req.user = user;
+          return user && models.Users.compare(req.body.password, user.password, user.salt);
+        })
+        .then(credentialsAreValid => {
+          if (credentialsAreValid) {
+            console.log('SUCCESS! You deserve a session, friend');
+            // then assign req.user to session
+            // use hash from cookie.shortbread to sessions.get from db
+            models.Sessions.update({ hash: req.cookies.shortbread }, { userId: req.user.id });
+            res.location('/');
+            res.sendStatus(200);
+          } else {
+            console.log('INVALID credentials, please try again');
+            res.location('/login');
+            res.sendStatus(401);
+          }
+        });
     });
+  });
 });
 
 /************************************************************/

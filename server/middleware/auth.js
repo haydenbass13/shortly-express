@@ -3,7 +3,6 @@ const Promise = require('bluebird');
 const parseCookies = require('./cookieParser');
 
 module.exports.createSession = (req, res, next = () => { }) => {
-  // parseCookies(req, res, next);
   if (req.cookies && req.cookies.shortbread) {
     models.Sessions.get({ hash: req.cookies.shortbread })
       .then(session => {
@@ -29,6 +28,8 @@ module.exports.createSession = (req, res, next = () => { }) => {
       })
       .then(session => {
         req.session = session;
+        req.cookies = req.cookies ? req.cookies : {};
+        req.cookies.shortbread = session.hash;
         res.cookie('shortbread', session.hash);
         next();
       });
