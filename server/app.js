@@ -78,11 +78,13 @@ app.post('/links',
 // Write your authentication routes here
 /************************************************************/
 
+// TODO create an invalid session
 app.get('/signup',
   (req, res) => {
     res.render('signup');
   });
 
+// TODO validate session upon successful login
 app.post('/signup', (req, res) => {
   models.Users.create(req.body)
     .then(() => {
@@ -96,11 +98,13 @@ app.post('/signup', (req, res) => {
     });
 });
 
+// TODO create an invalid session
 app.get('/login',
   (req, res) => {
     res.render('login');
   });
 
+// TODO validate session upon successful login
 app.post('/login', (req, res) => {
   models.Users.get({ username: req.body.username })
     .then(user => {

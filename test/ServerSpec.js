@@ -325,7 +325,6 @@ describe('', function () {
     });
   });
 
-  // TODO express middleware
   describe('Express Middleware', function () {
     var cookieParser = require('../server/middleware/cookieParser.js');
     var createSession = require('../server/middleware/auth.js').createSession;
@@ -336,12 +335,12 @@ describe('', function () {
         var requestWithoutCookies = httpMocks.createRequest();
         var requestWithCookies = httpMocks.createRequest({
           headers: {
-            Cookie: 'shortlyid=8a864482005bcc8b968f2b18f8f7ea490e577b20'
+            Cookie: 'shortbread=8a864482005bcc8b968f2b18f8f7ea490e577b20'
           }
         });
         var requestWithMultipleCookies = httpMocks.createRequest({
           headers: {
-            Cookie: 'shortlyid=18ea4fb6ab3178092ce936c591ddbb90c99c9f66; otherCookie=2a990382005bcc8b968f2b18f8f7ea490e990e78; anotherCookie=8a864482005bcc8b968f2b18f8f7ea490e577b20'
+            Cookie: 'shortbread=18ea4fb6ab3178092ce936c591ddbb90c99c9f66; otherCookie=2a990382005bcc8b968f2b18f8f7ea490e990e78; anotherCookie=8a864482005bcc8b968f2b18f8f7ea490e577b20'
           }
         });
 
@@ -356,14 +355,14 @@ describe('', function () {
         cookieParser(requestWithCookies, response, function () {
           var cookies = requestWithCookies.cookies;
           expect(cookies).to.be.an('object');
-          expect(cookies).to.eql({ shortlyid: '8a864482005bcc8b968f2b18f8f7ea490e577b20' });
+          expect(cookies).to.eql({ shortbread: '8a864482005bcc8b968f2b18f8f7ea490e577b20' });
         });
 
         cookieParser(requestWithMultipleCookies, response, function () {
           var cookies = requestWithMultipleCookies.cookies;
           expect(cookies).to.be.an('object');
           expect(cookies).to.eql({
-            shortlyid: '18ea4fb6ab3178092ce936c591ddbb90c99c9f66',
+            shortbread: '18ea4fb6ab3178092ce936c591ddbb90c99c9f66',
             otherCookie: '2a990382005bcc8b968f2b18f8f7ea490e990e78',
             anotherCookie: '8a864482005bcc8b968f2b18f8f7ea490e577b20'
           });
@@ -392,8 +391,8 @@ describe('', function () {
 
         createSession(requestWithoutCookie, response, function () {
           var cookies = response.cookies;
-          expect(cookies['shortlyid']).to.exist;
-          expect(cookies['shortlyid'].value).to.exist;
+          expect(cookies['shortbread']).to.exist;
+          expect(cookies['shortbread'].value).to.exist;
           done();
         });
       });
@@ -404,10 +403,10 @@ describe('', function () {
         var response = httpMocks.createResponse();
 
         createSession(requestWithoutCookie, response, function () {
-          var cookie = response.cookies.shortlyid.value;
+          var cookie = response.cookies.shortbread.value;
           var secondResponse = httpMocks.createResponse();
           var requestWithCookies = httpMocks.createRequest();
-          requestWithCookies.cookies.shortlyid = cookie;
+          requestWithCookies.cookies.shortbread = cookie;
 
           createSession(requestWithCookies, secondResponse, function () {
             var session = requestWithCookies.session;
@@ -451,7 +450,7 @@ describe('', function () {
 
               var secondResponse = httpMocks.createResponse();
               var requestWithCookies = httpMocks.createRequest();
-              requestWithCookies.cookies.shortlyid = hash;
+              requestWithCookies.cookies.shortbread = hash;
 
               createSession(requestWithCookies, secondResponse, function () {
                 var session = requestWithCookies.session;
@@ -469,10 +468,10 @@ describe('', function () {
         var maliciousCookieHash = '8a864482005bcc8b968f2b18f8f7ea490e577b20';
         var response = httpMocks.createResponse();
         var requestWithMaliciousCookie = httpMocks.createRequest();
-        requestWithMaliciousCookie.cookies.shortlyid = maliciousCookieHash;
+        requestWithMaliciousCookie.cookies.shortbread = maliciousCookieHash;
 
         createSession(requestWithMaliciousCookie, response, function () {
-          var cookie = response.cookies.shortlyid;
+          var cookie = response.cookies.shortbread;
           expect(cookie).to.exist;
           expect(cookie).to.not.equal(maliciousCookieHash);
           done();

@@ -2,14 +2,35 @@ const models = require('../models');
 const Promise = require('bluebird');
 
 module.exports.createSession = (req, res, next) => {
-  let cookies = req.cookies; // has session hash, cookie name 'shortbread'
-  // if 'shortbread' cookie exists on request
-  // query database for the session hash
-  // else
-  // create a new session
-  // assign the user to the session
-  //object with property 'hash' & userID
-  next();
+  if (!req.cookies.shortbread) {
+    models.Sessions.create()
+      .then(okPacket => {
+        return models.Sessions.get({ id: okPacket.insertId });
+      })
+      .then(session => {
+        req.session = session;
+        res.cookie('shortbread', session.hash);
+        next();
+      });
+  } else {
+    models.Sessions.get({ hash: req.cookies.shortbread })
+      .then(session => {
+        if (session) {
+          req.session = session;
+          next();
+        } else {
+          models.Sessions.create()
+            .then(okPacket => {
+              return models.Sessions.get({ id: okPacket.insertId });
+            })
+            .then(session => {
+              req.session = session;
+              res.cookie('shortbread', session.hash);
+              next();
+            });
+        }
+      });
+  }
 };
 
 /************************************************************/
