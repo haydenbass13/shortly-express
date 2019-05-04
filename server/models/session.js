@@ -39,7 +39,6 @@ class Sessions extends Model {
           return session;
         }
         return Users.get({ id: session.userId }).then(user => {
-          console.log(user);
           session.user = user;
           return session;
         });
