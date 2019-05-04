@@ -102,7 +102,6 @@ app.get('/login',
   });
 
 app.post('/login', (req, res) => {
-  // get user matching the inputted username
   models.Users.get({ username: req.body.username })
     .then(user => {
       return user && models.Users.compare(req.body.password, user.password, user.salt);
@@ -118,8 +117,6 @@ app.post('/login', (req, res) => {
         res.sendStatus(401);
       }
     });
-  // then compare
-  // then alert or start session
 });
 
 /************************************************************/
