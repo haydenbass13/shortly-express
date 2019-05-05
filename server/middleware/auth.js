@@ -1,6 +1,5 @@
 const models = require('../models');
 const Promise = require('bluebird');
-const parseCookies = require('./cookieParser');
 
 module.exports.createSession = (req, res, next = () => { }) => {
   if (req.cookies && req.cookies.shortbread) {
@@ -40,3 +39,24 @@ module.exports.createSession = (req, res, next = () => { }) => {
 // Add additional authentication middleware functions below
 /************************************************************/
 
+module.exports.verifySession = (req, res, next) => {
+  // query database for session using cookie
+  // if (req.cookies) {
+  //   models.Sessions.get({ hash: req.cookies.shortbread })
+  //     .then(session => {
+  //       if (!models.Sessions.isLoggedIn(session)) {
+  //         res.redirect('/login');
+  //       } else {
+  //         next();
+  //       }
+  //     });
+  // } else {
+  //   next();
+  // }
+  if (!models.Sessions.isLoggedIn(req.session)) {
+    console.log('HI VIVIAN, AUTH VERIFY SESSION');
+    res.redirect('/login')
+  } else {
+    next();
+  }
+}

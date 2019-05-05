@@ -480,7 +480,6 @@ describe('', function () {
     });
   });
 
-  // TODO sessions and cookies
   describe('Sessions and cookies', function () {
     var requestWithSession;
     var cookieJar;
@@ -531,7 +530,6 @@ describe('', function () {
       addUser(function (err, res, body) {
         if (err) { return done(err); }
         var cookies = cookieJar.getCookies('http://127.0.0.1:4568/');
-        console.log(cookies, 'COOKIES SPEC');
         var cookieValue = cookies[0].value;
 
         var queryString = `
@@ -548,7 +546,7 @@ describe('', function () {
       });
     });
 
-    xit('destroys session and cookie when logs out', function (done) {
+    it('destroys session and cookie when logs out', function (done) {
       addUser(function (err, res, body) {
         if (err) { return done(err); }
         var cookies = cookieJar.getCookies('http://127.0.0.1:4568/');
@@ -573,7 +571,7 @@ describe('', function () {
   });
 
   // TODO privileged access
-  xdescribe('Privileged Access:', function () {
+  describe('Privileged Access:', function () {
 
     it('Redirects to login page if a user tries to access the main page and is not signed in', function (done) {
       request('http://127.0.0.1:4568/', function (error, res, body) {
@@ -614,7 +612,7 @@ describe('', function () {
       }
     };
 
-    xbeforeEach(function (done) {
+    beforeEach(function (done) {
       var options = {
         'method': 'POST',
         'followAllRedirects': true,
@@ -653,6 +651,7 @@ describe('', function () {
 
         requestWithSession(options, function (error, res, body) {
           if (error) { return done(error); }
+          console.log(res.body, 'STATUS HERE');
           expect(res.body.url).to.equal('http://www.google.com/');
           expect(res.body.code).to.not.be.null;
           done();
