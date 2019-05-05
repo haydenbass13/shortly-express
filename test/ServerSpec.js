@@ -36,7 +36,7 @@ describe('', function () {
   beforeEach(function (done) {
 
     /*************************************************************************************/
-    /* TODO: Update user and password if different than on your local machine            */
+    /* Update user and password if different than on your local machine            */
     /*************************************************************************************/
     db = mysql.createConnection({
       user: 'root',
@@ -45,7 +45,7 @@ describe('', function () {
     });
 
     /**************************************************************************************/
-    /* TODO: If you create a new MySQL tables, add it to the tablenames collection below. */
+    /* If you create a new MySQL tables, add it to the tablenames collection below. */
     /**************************************************************************************/
     var tablenames = ['links', 'clicks', 'users', 'sessions'];
 
@@ -570,7 +570,6 @@ describe('', function () {
     });
   });
 
-  // TODO privileged access
   describe('Privileged Access:', function () {
 
     it('Redirects to login page if a user tries to access the main page and is not signed in', function (done) {
