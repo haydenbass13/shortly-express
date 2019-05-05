@@ -40,23 +40,9 @@ module.exports.createSession = (req, res, next = () => { }) => {
 /************************************************************/
 
 module.exports.verifySession = (req, res, next) => {
-  // query database for session using cookie
-  // if (req.cookies) {
-  //   models.Sessions.get({ hash: req.cookies.shortbread })
-  //     .then(session => {
-  //       if (!models.Sessions.isLoggedIn(session)) {
-  //         res.redirect('/login');
-  //       } else {
-  //         next();
-  //       }
-  //     });
-  // } else {
-  //   next();
-  // }
   if (!models.Sessions.isLoggedIn(req.session)) {
-    console.log('HI VIVIAN, AUTH VERIFY SESSION');
-    res.redirect('/login')
+    res.redirect('/login');
   } else {
     next();
   }
-}
+};

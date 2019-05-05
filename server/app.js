@@ -17,24 +17,14 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, '../public')));
 app.use(parseCookies);
 app.use(Auth.createSession);
-// app.use(Auth.verifySession);
 
 
-
-app.get('/', (req, res) => {
-  // parseCookies(req, res, () => {
-    // Auth.createSession(req, res, () => {
-      Auth.verifySession(req, res, () => res.render('index'));
-    // });
-  // });
+app.get('/', Auth.verifySession, (req, res) => {
+  res.render('index');
 });
 
-app.get('/create', (req, res) => {
-  // parseCookies(req, res, () => {
-    // Auth.createSession(req, res, () => {
-      Auth.verifySession(req, res, () => res.render('index'));
-    // });
-  // });
+app.get('/create', Auth.verifySession, (req, res) => {
+  res.render('index');
 });
 
 app.get('/links', Auth.verifySession,
@@ -52,7 +42,6 @@ app.post('/links', Auth.verifySession,
   (req, res, next) => {
     var url = req.body.url;
     if (!models.Links.isValidUrl(url)) {
-      // send back a 404 if link is not valid
       return res.sendStatus(404);
     }
 
@@ -80,7 +69,6 @@ app.post('/links', Auth.verifySession,
         res.status(500).send(error);
       })
       .catch(link => {
-        console.log(link, 'HEY');
         res.status(200).send(link);
       });
   });
@@ -91,50 +79,38 @@ app.post('/links', Auth.verifySession,
 
 app.get('/signup',
   (req, res) => {
-    // parseCookies(req, res, () => {
-      // Auth.createSession(req, res, () => 
-      res.render('signup');
-    // });
+    res.render('signup');
   });
 
 app.get('/logout', (req, res) => {
   console.log('BYE!');
   if (req.headers.cookie) {
-    parseCookies(req, res, () => {
-      models.Sessions.get({ hash: req.cookies.shortbread })
-        .then(session => {
-          console.log(session);
-          if (session && models.Sessions.isLoggedIn(session)) {
-            models.Sessions.delete({ hash: session.hash })
-            res.clearCookie('shortbread');
-            Auth.createSession(req, res, () => {
-              res.redirect('/login');
-            });
-          }
-        });
-    });
+    models.Sessions.get({ hash: req.cookies.shortbread })
+      .then(session => {
+        if (session && models.Sessions.isLoggedIn(session)) {
+          models.Sessions.delete({ hash: session.hash });
+          res.clearCookie('shortbread');
+          res.redirect('/login');
+        }
+      });
   } else {
     res.end();
   }
 });
 
 app.post('/signup', (req, res) => {
-  // parseCookies(req, res, () => {
-    // Auth.createSession(req, res, () => {
-      models.Users.create(req.body)
-        .then(() => {
-          return models.Users.get({ username: req.body.username });
-        })
-        .then(user => {
-          models.Sessions.update({ hash: req.cookies.shortbread }, { userId: user.id });
-          res.redirect('/');
-        })
-        .catch(err => {
-          console.error(err);
-          res.redirect('/signup');
-        });
-    // });
-  // });
+  models.Users.create(req.body)
+    .then(() => {
+      return models.Users.get({ username: req.body.username });
+    })
+    .then(user => {
+      models.Sessions.update({ hash: req.session.hash }, { userId: user.id });
+      res.redirect('/');
+    })
+    .catch(err => {
+      console.error(err);
+      res.redirect('/signup');
+    });
 });
 
 app.get('/login',
@@ -143,26 +119,21 @@ app.get('/login',
   });
 
 app.post('/login', (req, res) => {
-  // parseCookies(req, res, () => {
-    // Auth.createSession(req, res, () => {
-      models.Users.get({ username: req.body.username })
-        .then(user => {
-          req.user = user;
-          return user && models.Users.compare(req.body.password, user.password, user.salt);
-        })
-        .then(credentialsAreValid => {
-          if (credentialsAreValid) {
-            console.log('SUCCESS! You deserve a session, friend');
-            models.Sessions.update({ hash: req.cookies.shortbread }, { userId: req.user.id });
-            res.redirect('/');
-            // res.sendStatus(200);
-          } else {
-            console.log('INVALID credentials, please try again');
-            res.redirect('/login');
-          }
-        });
-    // });
-  // });
+  models.Users.get({ username: req.body.username })
+    .then(user => {
+      req.user = user;
+      return user && models.Users.compare(req.body.password, user.password, user.salt);
+    })
+    .then(credentialsAreValid => {
+      if (credentialsAreValid) {
+        console.log('SUCCESS! You deserve a session, friend');
+        models.Sessions.update({ hash: req.cookies.shortbread }, { userId: req.user.id });
+        res.redirect('/');
+      } else {
+        console.log('INVALID credentials, please try again');
+        res.redirect('/login');
+      }
+    });
 });
 
 /************************************************************/

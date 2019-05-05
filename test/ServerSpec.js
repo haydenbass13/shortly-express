@@ -651,7 +651,6 @@ describe('', function () {
 
         requestWithSession(options, function (error, res, body) {
           if (error) { return done(error); }
-          console.log(res.body, 'STATUS HERE');
           expect(res.body.url).to.equal('http://www.google.com/');
           expect(res.body.code).to.not.be.null;
           done();
